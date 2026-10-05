@@ -55,3 +55,20 @@ html.lenis {
   0% { background-position: 200% center; }
   100% { background-position: -200% center; }
 }
+
+/* Custom Animated Cursor: Hide native OS pointer on desktop/fine-pointer devices */
+@media (pointer: fine) {
+  html,
+  body {
+    cursor: none;
+  }
+
+  html.custom-cursor-active,
+  html.custom-cursor-active body,
+  html.custom-cursor-active *,
+  html.custom-cursor-active *::before,
+  html.custom-cursor-active *::after {
+    cursor: none !important;
+  }
+}
+

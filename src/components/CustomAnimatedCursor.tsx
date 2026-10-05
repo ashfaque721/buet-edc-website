@@ -15,6 +15,8 @@ export default function CustomAnimatedCursor() {
   const mousePos = useRef({ x: -100, y: -100 });
   const ringPos = useRef({ x: -100, y: -100 });
   const rafId = useRef<number | null>(null);
+  const isVisibleRef = useRef(false);
+  const isInitialMove = useRef(true);
 
   useEffect(() => {
     // Only enable on devices with a mouse/trackpad
@@ -22,11 +24,24 @@ export default function CustomAnimatedCursor() {
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
     if (!hasFinePointer) return;
 
+    document.documentElement.classList.add("custom-cursor-active");
     setMounted(true);
 
     const onMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
-      if (!isVisible) setIsVisible(true);
+
+      if (isInitialMove.current) {
+        ringPos.current = { x: e.clientX, y: e.clientY };
+        if (ringRef.current) {
+          ringRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        }
+        isInitialMove.current = false;
+      }
+
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
 
       // Instantly position the inner dot wrapper
       if (dotRef.current) {
@@ -47,8 +62,14 @@ export default function CustomAnimatedCursor() {
 
     const onMouseDown = () => setIsClicked(true);
     const onMouseUp = () => setIsClicked(false);
-    const onMouseLeave = () => setIsVisible(false);
-    const onMouseEnter = () => setIsVisible(true);
+    const onMouseLeave = () => {
+      isVisibleRef.current = false;
+      setIsVisible(false);
+    };
+    const onMouseEnter = () => {
+      isVisibleRef.current = true;
+      setIsVisible(true);
+    };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("mousedown", onMouseDown, { passive: true });
@@ -56,7 +77,7 @@ export default function CustomAnimatedCursor() {
     document.addEventListener("mouseleave", onMouseLeave, { passive: true });
     document.addEventListener("mouseenter", onMouseEnter, { passive: true });
 
-    // Smooth animation loop for the trailing outer ring
+    // Smooth animation loop for trailing outer ring
     const lerp = (start: number, end: number, factor: number) =>
       start + (end - start) * factor;
 
@@ -74,6 +95,7 @@ export default function CustomAnimatedCursor() {
     rafId.current = requestAnimationFrame(renderLoop);
 
     return () => {
+      document.documentElement.classList.remove("custom-cursor-active");
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mouseup", onMouseUp);
@@ -81,7 +103,7 @@ export default function CustomAnimatedCursor() {
       document.removeEventListener("mouseenter", onMouseEnter);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, [isVisible]);
+  }, []);
 
   if (!mounted) return null;
 

@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-brand-primary: #013565;
+  --color-brand-secondary: #0e3775;
+  --color-brand-accent: #38bdf8;
+  --color-brand-light: #ffffff;
+  
+  --color-glass-start: rgba(14, 55, 117, 0.25);
+  --color-glass-end: rgba(1, 53, 101, 0.45);
+
+  --animate-marquee: marquee 40s linear infinite;
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+:root {
+  --background: #001124;
+  --foreground: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Base Styles */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.glass-panel {
+  @apply bg-gradient-to-br from-[var(--color-glass-start)] to-[var(--color-glass-end)] backdrop-blur-md border border-white/10;
+}
+
+@keyframes shiny-text {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}

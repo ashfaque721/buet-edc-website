@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useLayoutEffect, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import clsx from "clsx";
@@ -19,7 +19,7 @@ export default function Gallery() {
 
   const homepagePhotos = photos.filter(p => p.showOnHomepage).slice(0, 5); // take up to 5 for the layout
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window === "undefined" || !mounted) return;
     gsap.registerPlugin(ScrollTrigger);
     

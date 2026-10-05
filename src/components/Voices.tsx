@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { Quote } from "lucide-react";
@@ -26,7 +26,7 @@ const voices = [
 export default function Voices() {
   const containerRef = useRef<HTMLElement>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window === "undefined") return;
     gsap.registerPlugin(ScrollTrigger);
     

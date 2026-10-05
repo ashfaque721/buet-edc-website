@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useLayoutEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { Target, Lightbulb } from "lucide-react";
@@ -9,7 +9,7 @@ import SpotlightCard from "@/components/reactbits/SpotlightCard";
 export default function MissionVision() {
   const containerRef = useRef<HTMLElement>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window === "undefined") return;
     gsap.registerPlugin(ScrollTrigger);
 

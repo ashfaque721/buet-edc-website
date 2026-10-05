@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           
           <div className="col-span-1 md:col-span-1">
-            <Link href="/" className="inline-block mb-6">
+            <Link href="/" prefetch={true} className="inline-block mb-6">
               <img src="/logo-light.png" alt="BUET EDC Logo" className="h-16 w-auto" />
             </Link>
             <p className="text-white/60 mb-6 leading-relaxed">

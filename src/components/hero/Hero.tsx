@@ -19,17 +19,15 @@ const TYPING_WORDS = [
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
 
-  useGsapContext(containerRef);
-
-  React.useLayoutEffect(() => {
+  React.useEffect(() => {
     let ctx = gsap.context(() => {
       gsap.from(".hero-anim", {
-        y: 40,
+        y: 30,
         opacity: 0,
-        duration: 1,
-        stagger: 0.15,
+        duration: 0.8,
+        stagger: 0.12,
         ease: "power3.out",
-        delay: 0.2,
+        delay: 0.1,
       });
     }, containerRef);
     return () => ctx.revert();

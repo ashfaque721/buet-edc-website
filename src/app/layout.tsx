@@ -38,6 +38,15 @@ export const metadata: Metadata = {
     description: "The official Entrepreneurship Development Club of BUET.",
     images: ["https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1200&auto=format&fit=crop"],
   },
+  icons: {
+    icon: [
+      { url: "/logo-light.png", href: "/logo-light.png" },
+    ],
+    apple: [
+      { url: "/logo-light.png", href: "/logo-light.png" },
+    ],
+    shortcut: "/logo-light.png",
+  },
 };
 
 import GlowCursor from "@/components/reactbits/GlowCursor";

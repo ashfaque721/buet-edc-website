@@ -70,9 +70,6 @@ export default function Voices() {
         
         {/* Section Header */}
         <div className="voice-header text-center mb-14 sm:mb-16">
-          <span className="inline-block py-1 px-3.5 rounded-full bg-brand-accent/15 text-brand-accent font-semibold text-xs tracking-wider uppercase border border-brand-accent/30 mb-3 shadow-[0_0_15px_rgba(56,189,248,0.15)]">
-            Perspectives & Testimonials
-          </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
             Voices of <span className="text-brand-accent">EDC</span>
           </h2>

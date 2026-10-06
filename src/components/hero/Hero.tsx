@@ -50,11 +50,11 @@ export default function Hero() {
       {/* ── Hero content ── */}
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         {/* ── Headline with React Bits TextType Typing Animation ── */}
-        <h1 className="hero-anim text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.25rem] font-extrabold tracking-tighter mb-7 leading-[1.1] sm:leading-[1.08] text-white drop-shadow-[0_2px_32px_rgba(0,17,36,0.9)]">
+        <h1 className="hero-anim text-4xl sm:text-5xl md:text-[4.5rem] lg:text-[5.25rem] font-extrabold tracking-tighter mb-7 leading-[1.1] sm:leading-[1.08] text-white drop-shadow-[0_2px_32px_rgba(0,17,36,0.9)] min-h-[135px] sm:min-h-[160px] md:min-h-[190px]">
           Empowering the Next
           <br className="hidden sm:block" />
           Generation of{" "}
-          <span className="relative inline-flex items-baseline overflow-visible">
+          <span className="relative inline-block overflow-visible min-w-[190px] sm:min-w-[260px] md:min-w-[340px] min-h-[1.15em] align-baseline">
             <TextType
               as="span"
               text={TYPING_WORDS}

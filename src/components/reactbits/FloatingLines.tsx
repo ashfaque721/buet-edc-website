@@ -298,10 +298,18 @@ export default function FloatingLines({
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
 
   const getLineCount = (waveType: 'top' | 'middle' | 'bottom'): number => {
-    if (typeof lineCount === 'number') return lineCount;
-    if (!enabledWaves.includes(waveType)) return 0;
-    const index = enabledWaves.indexOf(waveType);
-    return lineCount[index] ?? 6;
+    let count = 6;
+    if (typeof lineCount === 'number') {
+      count = lineCount;
+    } else if (enabledWaves.includes(waveType)) {
+      const index = enabledWaves.indexOf(waveType);
+      count = lineCount[index] ?? 6;
+    } else {
+      return 0;
+    }
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    return isMobile ? Math.max(2, Math.round(count * 0.5)) : count;
   };
 
   const getLineDistance = (waveType: 'top' | 'middle' | 'bottom'): number => {
@@ -362,8 +370,9 @@ export default function FloatingLines({
         alpha: true,
         powerPreference: 'high-performance'
       });
-      // Cap DPR to 1.25 for buttery smooth rendering and 70% lower GPU overhead
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      const maxDpr = isMobile ? 1.0 : 1.25;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
       renderer.domElement.style.width = '100%';
       renderer.domElement.style.height = '100%';
       renderer.domElement.style.position = 'absolute';

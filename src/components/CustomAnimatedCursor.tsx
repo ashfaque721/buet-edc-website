@@ -21,8 +21,9 @@ export default function CustomAnimatedCursor() {
   useEffect(() => {
     // Only enable on devices with a mouse/trackpad
     if (typeof window === "undefined") return;
+    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-    if (!hasFinePointer) return;
+    if (isCoarse || !hasFinePointer) return;
 
     document.documentElement.classList.add("custom-cursor-active");
     setMounted(true);

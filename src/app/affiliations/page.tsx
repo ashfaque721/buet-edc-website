@@ -37,6 +37,10 @@ export default function AffiliationsPage() {
                       <img 
                         src={ca.logoUrl} 
                         alt={ca.company} 
+                        width={48}
+                        height={48}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover rounded-xl" 
                       />
                     ) : (
@@ -57,6 +61,7 @@ export default function AffiliationsPage() {
                     src={ca.photoUrl} 
                     alt={ca.name} 
                     fill
+                    loading="lazy"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out" 
                   />

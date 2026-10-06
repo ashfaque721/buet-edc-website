@@ -37,17 +37,21 @@ export default function SponsorsMarquee() {
         <div className="absolute top-0 bottom-0 right-0 w-24 md:w-56 bg-gradient-to-l from-[#001124] via-[#001124]/90 to-transparent z-20 pointer-events-none" />
 
         {/* Scrolling Track (Only Logos, Bigger, No Borders) */}
-        <div className="flex w-max gap-16 sm:gap-24 md:gap-28 animate-marquee hover:[animation-play-state:paused] items-center">
+        <div className="flex w-max gap-16 sm:gap-24 md:gap-28 animate-marquee hover:[animation-play-state:paused] items-center min-h-[5rem]">
           {carouselItems.map((sponsor, index) => (
             <div
               key={`${sponsor.id}-${index}`}
-              className="flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-115 cursor-pointer select-none"
+              className="flex items-center justify-center shrink-0 h-14 sm:h-18 md:h-20 min-w-[100px] transition-transform duration-300 hover:scale-115 cursor-pointer select-none"
               title={sponsor.name}
             >
               {sponsor.logoUrl ? (
                 <img
                   src={sponsor.logoUrl}
                   alt={sponsor.name}
+                  loading="lazy"
+                  decoding="async"
+                  width={200}
+                  height={80}
                   className="h-14 sm:h-18 md:h-20 w-auto max-w-[160px] sm:max-w-[210px] md:max-w-[240px] object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 filter drop-shadow-lg"
                 />
               ) : (

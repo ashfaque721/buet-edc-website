@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
@@ -12,7 +13,14 @@ export default function Footer() {
           
           <div className="col-span-1 md:col-span-1">
             <Link href="/" prefetch={true} className="inline-block mb-6">
-              <img src="/logo-light.png" alt="BUET EDC Logo" className="h-16 w-auto" />
+              <Image
+                src="/logo-light.png"
+                alt="BUET EDC Logo"
+                width={180}
+                height={64}
+                loading="lazy"
+                className="h-16 w-auto object-contain"
+              />
             </Link>
             <p className="text-white/60 mb-6 leading-relaxed">
               The official entrepreneurship club of Bangladesh University of Engineering and Technology, fostering innovation and venture building since inception.

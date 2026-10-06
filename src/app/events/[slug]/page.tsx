@@ -74,7 +74,7 @@ export default function EventDetailPage() {
                 <div className="grid sm:grid-cols-2 gap-6 mb-10">
                   {event.speakers.map((speaker, idx) => (
                     <div key={idx} className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
-                      <img src={speaker.photoUrl} alt={speaker.name} className="w-16 h-16 rounded-full object-cover" />
+                      <img src={speaker.photoUrl} alt={speaker.name} width={64} height={64} loading="lazy" decoding="async" className="w-16 h-16 rounded-full object-cover" />
                       <div>
                         <div className="font-bold">{speaker.name}</div>
                         <div className="text-sm text-white/60">{speaker.designation}</div>

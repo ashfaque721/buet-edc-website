@@ -19,11 +19,14 @@ export default function InitialPreloader() {
     setShouldRender(true);
 
     const ctx = gsap.context(() => {
-      // Counter animation logic
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const animDuration = isMobile ? 0.9 : 1.2;
+      const slideDuration = isMobile ? 0.6 : 0.8;
+
       const counter = { val: 0 };
       gsap.to(counter, {
         val: 100,
-        duration: 2,
+        duration: animDuration,
         ease: "power2.inOut",
         onUpdate: () => {
           if (counterRef.current) {
@@ -35,9 +38,9 @@ export default function InitialPreloader() {
           // Slide up animation
           gsap.to(containerRef.current, {
             yPercent: -100,
-            duration: 1,
+            duration: slideDuration,
             ease: "power4.inOut",
-            delay: 0.2,
+            delay: 0.1,
             onComplete: () => setShouldRender(false)
           });
         }

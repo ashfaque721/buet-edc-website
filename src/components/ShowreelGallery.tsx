@@ -38,10 +38,8 @@ export default function Gallery() {
     return () => ctx.revert();
   }, [mounted]);
 
-  if (!mounted) return null;
-
   return (
-    <section ref={containerRef} className="py-24 relative z-10 bg-brand-primary/50 backdrop-blur-sm border-y border-white/5" id="gallery-section">
+    <section ref={containerRef} className="py-24 relative z-10 bg-brand-primary/50 backdrop-blur-sm border-y border-white/5 min-h-[480px]" id="gallery-section">
       <div className="max-w-7xl mx-auto px-6">
         
         <div className="gallery-header text-center mb-16 flex flex-col items-center">
@@ -73,6 +71,7 @@ export default function Gallery() {
                 src={photo.imageUrl} 
                 alt="Gallery photo" 
                 fill
+                loading="lazy"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover transform group-hover:scale-105 transition-transform duration-500" 
               />

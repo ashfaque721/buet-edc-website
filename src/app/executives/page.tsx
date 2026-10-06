@@ -36,6 +36,7 @@ export default function ExecutivesPage() {
                     src={exec.photoUrl} 
                     alt={exec.name} 
                     fill
+                    loading="lazy"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out" 
                   />
@@ -95,6 +96,7 @@ export default function ExecutivesPage() {
                   src={exec.photoUrl} 
                   alt={exec.name} 
                   fill
+                  loading="lazy"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out" 
                 />

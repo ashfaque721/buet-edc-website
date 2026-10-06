@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from 'react';
 import { Mesh, Program, Renderer, Triangle } from 'ogl';
 
 const MAX_POINTS = 64;
@@ -200,6 +200,16 @@ const GlowCursor = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const propsRef = useRef<GlowCursorConfig>({} as GlowCursorConfig);
+  const [isFinePointer, setIsFinePointer] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+    const isFine = window.matchMedia("(pointer: fine)").matches;
+    if (!isCoarse && isFine) {
+      setIsFinePointer(true);
+    }
+  }, []);
 
   propsRef.current = {
     color,
@@ -224,6 +234,7 @@ const GlowCursor = ({
   };
 
   useEffect(() => {
+    if (!isFinePointer) return;
     const container = containerRef.current;
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
@@ -386,7 +397,9 @@ const GlowCursor = ({
       mesh.geometry.remove();
       program.remove();
     };
-  }, [maxDevicePixelRatio]);
+  }, [maxDevicePixelRatio, isFinePointer]);
+
+  if (!isFinePointer) return null;
 
   return (
     <div

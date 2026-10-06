@@ -14,13 +14,13 @@ export default function InitialPreloader() {
 
   useEffect(() => {
     const hasViewed = sessionStorage.getItem("edc_preloader_viewed");
-    
-    if (hasViewed) {
-      setShouldRender(false);
-      return;
+    if (!hasViewed) {
+      setShouldRender(true);
     }
-    
-    setShouldRender(true);
+  }, []);
+
+  useEffect(() => {
+    if (!shouldRender || !containerRef.current) return;
 
     const ctx = gsap.context(() => {
       const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -74,17 +74,19 @@ export default function InitialPreloader() {
       });
 
       // Ambient pulsing glow around the logo
-      gsap.to(logoRingRef.current, {
-        boxShadow: "0 0 45px rgba(56, 189, 248, 0.45)",
-        duration: 0.8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      });
+      if (logoRingRef.current) {
+        gsap.to(logoRingRef.current, {
+          boxShadow: "0 0 45px rgba(56, 189, 248, 0.45)",
+          duration: 0.8,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+      }
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [shouldRender]);
 
   if (!shouldRender) return null;
 
@@ -153,7 +155,8 @@ export default function InitialPreloader() {
               width={80}
               height={80}
               priority
-              className="w-auto h-12 sm:h-14 object-contain filter drop-shadow-[0_2px_12px_rgba(56,189,248,0.4)]"
+              style={{ width: "auto" }}
+              className="h-12 sm:h-14 object-contain filter drop-shadow-[0_2px_12px_rgba(56,189,248,0.4)]"
             />
           </div>
         </div>

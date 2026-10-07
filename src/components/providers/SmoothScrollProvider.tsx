@@ -9,6 +9,11 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
   const pathname = usePathname();
 
   useEffect(() => {
+    // Disable smooth scrolling on mobile / touch devices to preserve native momentum and prevent ScrollTrigger lag
+    if (typeof window === "undefined" || window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches) {
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.0,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

@@ -40,21 +40,31 @@ export default function SponsorsMarquee() {
               className="flex items-center justify-center shrink-0 h-14 sm:h-18 md:h-20 min-w-[100px] transition-transform duration-300 hover:scale-115 cursor-pointer select-none"
               title={sponsor.name}
             >
-              {sponsor.logoUrl ? (
-                <img
-                  src={sponsor.logoUrl}
-                  alt={sponsor.name}
-                  loading="lazy"
-                  decoding="async"
-                  width={200}
-                  height={80}
-                  className="h-14 sm:h-18 md:h-20 w-auto max-w-[160px] sm:max-w-[210px] md:max-w-[240px] object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 filter drop-shadow-lg"
-                />
-              ) : (
-                <span className="text-2xl sm:text-3xl font-extrabold text-white/60 hover:text-white transition-colors tracking-wider">
+              <div className="flex items-center justify-center">
+                {sponsor.logoUrl ? (
+                  <img
+                    src={sponsor.logoUrl}
+                    alt={sponsor.name}
+                    loading="lazy"
+                    decoding="async"
+                    width={200}
+                    height={80}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const textEl = e.currentTarget.parentElement?.querySelector(".sponsor-text-fallback");
+                      if (textEl) {
+                        (textEl as HTMLElement).style.display = "inline-block";
+                      }
+                    }}
+                    className="h-14 sm:h-18 md:h-20 w-auto max-w-[160px] sm:max-w-[210px] md:max-w-[240px] object-contain grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 filter drop-shadow-lg"
+                  />
+                ) : null}
+                <span
+                  className={`sponsor-text-fallback text-xl sm:text-2xl md:text-3xl font-extrabold text-white/70 hover:text-brand-accent transition-colors tracking-wider px-4 py-1.5 rounded-xl border border-white/10 bg-white/5 shadow-sm whitespace-nowrap ${sponsor.logoUrl ? "hidden" : "inline-block"}`}
+                >
                   {sponsor.name}
                 </span>
-              )}
+              </div>
             </div>
           ))}
         </div>

@@ -37,7 +37,7 @@ export default function Voices() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // Desktop: Rich staged entry
+      // Desktop only (>= 768px): Smooth staged entrance
       mm.add("(min-width: 768px)", () => {
         gsap.from(".voice-header", {
           scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
@@ -64,28 +64,7 @@ export default function Voices() {
           ease: "power2.out",
         });
       });
-
-      // Mobile (< 768px): Lightweight trigger at 95% viewport, zero pinning, no hidden card voids
-      mm.add("(max-width: 767px)", () => {
-        gsap.from(".voice-header", {
-          scrollTrigger: { trigger: containerRef.current, start: "top 95%", once: true },
-          opacity: 0,
-          duration: 0.5,
-        });
-
-        gsap.from(".moderator-spotlight", {
-          scrollTrigger: { trigger: ".moderator-spotlight", start: "top 95%", once: true },
-          opacity: 0,
-          duration: 0.5,
-        });
-
-        gsap.from(".voice-card", {
-          scrollTrigger: { trigger: ".voices-grid", start: "top 95%", once: true },
-          opacity: 0,
-          duration: 0.5,
-          stagger: 0.1,
-        });
-      });
+      // Mobile (< 768px): Completely bypass GSAP to ensure elements are NEVER hidden with opacity: 0
     }, containerRef);
 
     return () => ctx.revert();

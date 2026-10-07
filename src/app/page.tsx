@@ -1,16 +1,13 @@
-import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/hero/Hero";
 import ImpactMetrics from "@/components/ImpactMetrics";
 import MissionVision from "@/components/MissionVision";
+import ShowreelGallery from "@/components/ShowreelGallery";
+import Voices from "@/components/Voices";
+import SponsorsMarquee from "@/components/SponsorsMarquee";
 import JoinUsCta from "@/components/JoinUsCta";
+import StickyFooterReveal from "@/components/StickyFooterReveal";
 import HomeFloatingBackground from "@/components/home/HomeFloatingBackground";
-
-// Dynamically import below-the-fold components to slash mobile main-thread boot time
-const ShowreelGallery = dynamic(() => import("@/components/ShowreelGallery"));
-const Voices = dynamic(() => import("@/components/Voices"));
-const SponsorsMarquee = dynamic(() => import("@/components/SponsorsMarquee"));
-const StickyFooterReveal = dynamic(() => import("@/components/StickyFooterReveal"));
 
 export default function Home() {
   return (

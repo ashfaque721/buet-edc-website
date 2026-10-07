@@ -22,13 +22,7 @@ export default function JoinUsCta() {
           scale: 0.95, opacity: 0, duration: 1, ease: "power3.out"
         });
       });
-
-      mm.add("(max-width: 767px)", () => {
-        gsap.from(".cta-content", {
-          scrollTrigger: { trigger: containerRef.current, start: "top 95%", once: true },
-          opacity: 0, duration: 0.6, ease: "power2.out"
-        });
-      });
+      // Mobile (< 768px): Native display, no opacity: 0
     }, containerRef);
 
     return () => ctx.revert();

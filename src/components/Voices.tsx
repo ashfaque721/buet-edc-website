@@ -153,7 +153,7 @@ export default function Voices() {
                   fill
                   loading="lazy"
                   sizes="(max-width: 768px) 144px, 144px"
-                  className="object-cover object-top grayscale hover:grayscale-0 transition-all duration-500"
+                  className="object-cover object-top transition-transform duration-500 hover:scale-105"
                 />
               </div>
               <div className="absolute -bottom-2 -right-2 bg-brand-accent text-[#013565] p-1.5 rounded-xl shadow-lg border border-white/20">
@@ -268,7 +268,7 @@ export default function Voices() {
                           alt={president.name}
                           fill
                           sizes="56px"
-                          className="object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-300"
+                          className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
                         />
                       </div>
                       <div className="min-w-0">

@@ -35,29 +35,56 @@ export default function Voices() {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      gsap.from(".voice-header", {
-        scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        ease: "power3.out",
+      const mm = gsap.matchMedia();
+
+      // Desktop: Rich staged entry
+      mm.add("(min-width: 768px)", () => {
+        gsap.from(".voice-header", {
+          scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
+          y: 30,
+          opacity: 0,
+          duration: 0.8,
+          ease: "power3.out",
+        });
+
+        gsap.from(".moderator-spotlight", {
+          scrollTrigger: { trigger: ".moderator-spotlight", start: "top 82%", once: true },
+          y: 35,
+          opacity: 0,
+          duration: 0.9,
+          ease: "power3.out",
+        });
+
+        gsap.from(".voice-card", {
+          scrollTrigger: { trigger: ".voices-grid", start: "top 82%", once: true },
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: "power2.out",
+        });
       });
 
-      gsap.from(".moderator-spotlight", {
-        scrollTrigger: { trigger: ".moderator-spotlight", start: "top 82%", once: true },
-        y: 35,
-        opacity: 0,
-        duration: 0.9,
-        ease: "power3.out",
-      });
+      // Mobile (< 768px): Lightweight trigger at 95% viewport, zero pinning, no hidden card voids
+      mm.add("(max-width: 767px)", () => {
+        gsap.from(".voice-header", {
+          scrollTrigger: { trigger: containerRef.current, start: "top 95%", once: true },
+          opacity: 0,
+          duration: 0.5,
+        });
 
-      gsap.from(".voice-card", {
-        scrollTrigger: { trigger: ".voices-grid", start: "top 82%", once: true },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power2.out",
+        gsap.from(".moderator-spotlight", {
+          scrollTrigger: { trigger: ".moderator-spotlight", start: "top 95%", once: true },
+          opacity: 0,
+          duration: 0.5,
+        });
+
+        gsap.from(".voice-card", {
+          scrollTrigger: { trigger: ".voices-grid", start: "top 95%", once: true },
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+        });
       });
     }, containerRef);
 
@@ -65,11 +92,11 @@ export default function Voices() {
   }, []);
 
   return (
-    <section ref={containerRef} className="py-20 md:py-24 relative z-10" id="voices">
+    <section ref={containerRef} className="py-12 sm:py-16 md:py-24 relative z-10 h-auto min-h-0" id="voices">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}
-        <div className="voice-header text-center mb-14 sm:mb-16">
+        <div className="voice-header text-center mb-10 sm:mb-14">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
             Voices of <span className="text-brand-accent">EDC</span>
           </h2>
@@ -79,7 +106,7 @@ export default function Voices() {
         </div>
 
         {/* ── 1. Distinguished Club Moderator Spotlight Banner ── */}
-        <div className="moderator-spotlight rounded-3xl p-8 sm:p-10 md:p-12 border border-white/10 bg-gradient-to-br from-[#013565]/80 via-[#0e3775]/60 to-[#001124]/90 backdrop-blur-xl mb-12 sm:mb-14 relative overflow-hidden shadow-[0_12px_40px_0_rgba(1,53,101,0.4)]">
+        <div className="moderator-spotlight rounded-3xl p-6 sm:p-8 md:p-10 border border-white/10 bg-gradient-to-br from-[#013565]/80 via-[#0e3775]/60 to-[#001124]/90 backdrop-blur-xl mb-8 md:mb-12 relative overflow-hidden shadow-[0_12px_40px_0_rgba(1,53,101,0.4)]">
           {/* Ambient Glow in Corner */}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-brand-accent/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -132,7 +159,7 @@ export default function Voices() {
         </div>
 
         {/* ── 2. Student & Alumni Testimonials Grid ── */}
-        <div className="voices-grid grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="voices-grid h-auto min-h-0 grid grid-cols-1 md:grid-cols-3 gap-6">
           {studentAlumniVoices.map((voice, i) => (
             <div
               key={i}

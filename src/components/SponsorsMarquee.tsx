@@ -1,24 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSponsors } from "@/context/SponsorsContext";
+import React from "react";
+import { useSponsors, INITIAL_SPONSORS } from "@/context/SponsorsContext";
 
 export default function SponsorsMarquee() {
   const { sponsors } = useSponsors();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || sponsors.length === 0) return null;
+  // Fallback to static INITIAL_SPONSORS so marquee never collapses to height: 0 during SSR or loading
+  const displaySponsors = sponsors && sponsors.length > 0 ? sponsors : INITIAL_SPONSORS;
 
   // Duplicate sponsors array to ensure seamless continuous scrolling
-  const carouselItems = [...sponsors, ...sponsors, ...sponsors, ...sponsors];
+  const carouselItems = [...displaySponsors, ...displaySponsors, ...displaySponsors, ...displaySponsors];
 
   return (
-    <section className="py-24 relative z-10 overflow-hidden bg-transparent">
-      <div className="max-w-7xl mx-auto px-6 text-center mb-16">
+    <section className="py-12 sm:py-16 md:py-24 relative z-10 overflow-hidden bg-transparent h-auto min-h-0">
+      <div className="max-w-7xl mx-auto px-6 text-center mb-10 sm:mb-14">
         <span className="inline-block py-1 px-3.5 rounded-full bg-brand-accent/15 text-brand-accent font-semibold text-xs tracking-wider uppercase border border-brand-accent/30 mb-3 shadow-[0_0_15px_rgba(56,189,248,0.15)]">
           Past Sponsors & Partners
         </span>

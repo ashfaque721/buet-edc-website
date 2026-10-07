@@ -14,9 +14,20 @@ export default function JoinUsCta() {
     gsap.registerPlugin(ScrollTrigger);
     
     let ctx = gsap.context(() => {
-      gsap.from(".cta-content", {
-        scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
-        scale: 0.95, opacity: 0, duration: 1, ease: "power3.out"
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 768px)", () => {
+        gsap.from(".cta-content", {
+          scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
+          scale: 0.95, opacity: 0, duration: 1, ease: "power3.out"
+        });
+      });
+
+      mm.add("(max-width: 767px)", () => {
+        gsap.from(".cta-content", {
+          scrollTrigger: { trigger: containerRef.current, start: "top 95%", once: true },
+          opacity: 0, duration: 0.6, ease: "power2.out"
+        });
       });
     }, containerRef);
 
@@ -24,7 +35,7 @@ export default function JoinUsCta() {
   }, []);
 
   return (
-    <section ref={containerRef} className="py-24 relative z-10 px-6">
+    <section ref={containerRef} className="py-12 sm:py-16 md:py-24 relative z-10 px-6 h-auto min-h-0">
       <div className="max-w-5xl mx-auto cta-content">
         <div className="relative rounded-[2.5rem] overflow-hidden p-[2px] bg-gradient-to-br from-brand-accent/50 via-brand-secondary to-brand-primary group">
           <div className="absolute inset-0 bg-brand-accent/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />

@@ -10,7 +10,7 @@ export interface Sponsor {
   websiteUrl?: string;
 }
 
-const INITIAL_SPONSORS: Sponsor[] = [
+export const INITIAL_SPONSORS: Sponsor[] = [
   {
     id: "sp-1",
     name: "Walton",

@@ -24,7 +24,18 @@ export const mockData = {
       ],
       fbLink: "https://facebook.com/events/buet-ideathon-2025",
       attendees: [
-        { id: "att-1", name: "Ashfaque Amin Eshan", email: "eshan@example.com", phone: "01700000000", institution: "BUET", dept: "CSE", batch: "21" }
+        {
+          id: "att-1",
+          name: "Ashfaque Amin Eshan",
+          email: "eshan@example.com",
+          phone: "01700000000",
+          institution: "BUET",
+          studentId: "2105001",
+          dept: "CSE",
+          year: "4th Year",
+          paymentMethod: "bKash",
+          trxId: "9J28A7LK1Q"
+        }
       ]
     },
     {

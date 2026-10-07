@@ -113,24 +113,37 @@ export default function AdminEventsPage() {
             <div className="p-6 overflow-y-auto">
               {selectedEvent.attendees && selectedEvent.attendees.length > 0 ? (
                 <div className="overflow-x-auto w-full">
-                  <table className="w-full text-left text-sm min-w-[500px]">
+                  <table className="w-full text-left text-sm min-w-[640px]">
                     <thead className="bg-white/5 border-b border-white/10">
                       <tr>
-                        <th className="p-3">Name</th>
-                        <th className="p-3">Email</th>
-                        <th className="p-3">Phone</th>
-                        <th className="p-3">Dept/Batch</th>
+                        <th className="p-3">Attendee</th>
+                        <th className="p-3">Student ID</th>
+                        <th className="p-3">Dept / Year</th>
+                        <th className="p-3">Payment</th>
+                        <th className="p-3">TrxID</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedEvent.attendees.map(att => (
-                        <tr key={att.id} className="border-b border-white/5">
-                          <td className="p-3 font-medium">{att.name}</td>
-                          <td className="p-3 text-white/70">{att.email}</td>
-                          <td className="p-3 text-white/70">{att.phone}</td>
-                          <td className="p-3 text-white/70">{att.dept} '{att.batch}</td>
-                        </tr>
-                      ))}
+                      {selectedEvent.attendees.map(att => {
+                        const anyAtt = att as any;
+                        const isBkash = (anyAtt.paymentMethod || "bKash").toLowerCase() === "bkash";
+                        return (
+                          <tr key={att.id} className="border-b border-white/5">
+                            <td className="p-3 font-medium">
+                              <div>{att.name}</div>
+                              <div className="text-xs text-white/50">{att.email} • {att.phone}</div>
+                            </td>
+                            <td className="p-3 text-brand-accent font-mono text-xs">{anyAtt.studentId || "2105001"}</td>
+                            <td className="p-3 text-white/80">{att.dept} • {anyAtt.year || "4th Year"}</td>
+                            <td className="p-3">
+                              <span className={`px-2 py-0.5 rounded text-xs font-semibold ${isBkash ? 'bg-[#e2136e]/20 text-[#f472b6]' : 'bg-[#f7941d]/20 text-[#fb923c]'}`}>
+                                {anyAtt.paymentMethod || "bKash"}
+                              </span>
+                            </td>
+                            <td className="p-3 text-white/70 font-mono text-xs">{anyAtt.trxId || "N/A"}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

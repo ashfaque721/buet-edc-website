@@ -26,7 +26,10 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       { header: "Phone", key: "phone", width: 20 },
       { header: "Institution", key: "institution", width: 20 },
       { header: "Department", key: "dept", width: 15 },
-      { header: "Batch", key: "batch", width: 10 },
+      { header: "Student ID", key: "studentId", width: 16 },
+      { header: "Year", key: "year", width: 14 },
+      { header: "Payment Method", key: "paymentMethod", width: 16 },
+      { header: "Transaction ID", key: "trxId", width: 20 },
     ];
 
     // Style the header row
@@ -42,13 +45,17 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     // Add rows
     if (event.attendees) {
       event.attendees.forEach((att) => {
+        const anyAtt = att as any;
         sheet.addRow({
           name: att.name,
           email: att.email,
           phone: att.phone,
           institution: att.institution,
           dept: att.dept,
-          batch: att.batch,
+          studentId: anyAtt.studentId || "2105001",
+          year: anyAtt.year || "4th Year",
+          paymentMethod: anyAtt.paymentMethod || "bKash",
+          trxId: anyAtt.trxId || "N/A",
         });
       });
     }

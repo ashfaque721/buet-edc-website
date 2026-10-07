@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import React from "react";
 import { Quote, Sparkles } from "lucide-react";
 import Image from "next/image";
 
@@ -28,50 +26,8 @@ const studentAlumniVoices = [
 ];
 
 export default function Voices() {
-  const containerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
-
-      // Desktop only (>= 768px): Smooth staged entrance
-      mm.add("(min-width: 768px)", () => {
-        gsap.from(".voice-header", {
-          scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
-          y: 30,
-          opacity: 0,
-          duration: 0.8,
-          ease: "power3.out",
-        });
-
-        gsap.from(".moderator-spotlight", {
-          scrollTrigger: { trigger: ".moderator-spotlight", start: "top 82%", once: true },
-          y: 35,
-          opacity: 0,
-          duration: 0.9,
-          ease: "power3.out",
-        });
-
-        gsap.from(".voice-card", {
-          scrollTrigger: { trigger: ".voices-grid", start: "top 82%", once: true },
-          y: 40,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.15,
-          ease: "power2.out",
-        });
-      });
-      // Mobile (< 768px): Completely bypass GSAP to ensure elements are NEVER hidden with opacity: 0
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <section ref={containerRef} className="py-12 sm:py-16 md:py-24 relative z-10 h-auto min-h-0" id="voices">
+    <section className="py-12 sm:py-16 md:py-24 relative z-10 h-auto min-h-0" id="voices">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header */}

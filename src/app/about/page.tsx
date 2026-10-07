@@ -4,12 +4,11 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import StickyFooterReveal from "@/components/StickyFooterReveal";
 import {
-  ShieldCheck,
-  Briefcase,
-  Rocket,
   Megaphone,
-  Code2,
-  BookOpen,
+  CalendarDays,
+  Handshake,
+  Boxes,
+  Palette,
   Target,
   Sparkles,
   TrendingUp,
@@ -18,45 +17,38 @@ import {
 const departments = [
   {
     number: "01",
-    title: "Administration & Operations",
-    icon: ShieldCheck,
+    title: "Media and Public Relations",
+    icon: Megaphone,
     description:
-      "Ensures smooth club operations, organizational discipline, logistics planning, and seamless on-ground event execution across all flagship summits.",
+      "Drives external communications, press outreach, social storytelling, and campus engagement to amplify BUET EDC's mission and entrepreneurial ecosystem.",
   },
   {
     number: "02",
-    title: "Corporate Relations & Sponsorship",
-    icon: Briefcase,
+    title: "Events",
+    icon: CalendarDays,
     description:
-      "Spearheads strategic brand partnerships, corporate sponsorships, and industry tie-ups with leading venture firms and multinational corporations.",
+      "Curates and executes flagship competitions, national ideathons, startup masterclasses, and networking summits with seamless on-ground coordination.",
   },
   {
     number: "03",
-    title: "Project & Incubation",
-    icon: Rocket,
+    title: "Sponsorship",
+    icon: Handshake,
     description:
-      "Mentors student startup ideas, runs intensive bootcamps, and coordinates venture acceleration programs to help founders build viable MVPs.",
+      "Establishes corporate partnerships, brand alliances, and industry sponsorships, securing vital capital and strategic resources for club ventures.",
   },
   {
     number: "04",
-    title: "Branding & Public Relations",
-    icon: Megaphone,
+    title: "Logistics",
+    icon: Boxes,
     description:
-      "Crafts the visual voice of EDC, leads media outreach, social narrative, and manages external communications to amplify our ecosystem.",
+      "Manages end-to-end venue operations, equipment procurement, stage infrastructure, and resource deployment for all on-campus and flagship events.",
   },
   {
     number: "05",
-    title: "Tech & Web Development",
-    icon: Code2,
+    title: "Design & Creatives",
+    icon: Palette,
     description:
-      "Engineers digital platforms, registration portals, and scalable web infrastructure powering our digital events and community tools.",
-  },
-  {
-    number: "06",
-    title: "Publications & Resources",
-    icon: BookOpen,
-    description:
-      "Curates entrepreneurial resources, industry case studies, monthly newsletters, and founder knowledge repositories for the wider BUET community.",
+      "Shapes the visual identity, digital assets, motion graphics, and print media, crafting captivating brand aesthetics for EDC initiatives.",
   },
 ];
 

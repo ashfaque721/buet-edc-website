@@ -75,8 +75,8 @@ export const mockData = {
     {
       id: "exec-004",
       name: "Rahat Khan",
-      designation: "Director of Operations",
-      wing: "Operations",
+      designation: "Director of Logistics",
+      wing: "Logistics",
       term: "current",
       photoUrl: "https://i.pravatar.cc/300?u=rahat",
       socials: { facebook: "#", linkedin: "#" }

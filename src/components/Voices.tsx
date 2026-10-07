@@ -44,7 +44,7 @@ const exPresidents = [
 
 export default function Voices() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(3);
+  const [itemsPerView, setItemsPerView] = useState(2);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -54,12 +54,10 @@ export default function Voices() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth < 640) {
         setItemsPerView(1);
-      } else if (window.innerWidth < 1024) {
-        setItemsPerView(2);
       } else {
-        setItemsPerView(3);
+        setItemsPerView(2);
       }
     };
     handleResize();
@@ -230,14 +228,14 @@ export default function Voices() {
 
           {/* Carousel Slider Window */}
           <div
-            className="overflow-hidden w-full relative select-none"
+            className="overflow-hidden w-full relative select-none py-2 -my-2"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             <div
-              className="flex"
+              className="flex -mx-3 items-stretch"
               onTransitionEnd={handleTransitionEnd}
               style={{
                 transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
@@ -249,10 +247,10 @@ export default function Voices() {
               {displayItems.map((president, index) => (
                 <div
                   key={`${president.name}-${index}`}
-                  className="shrink-0 px-3 flex"
+                  className="shrink-0 px-3 flex self-stretch"
                   style={{ width: `${100 / itemsPerView}%` }}
                 >
-                  <div className="w-full glass-panel rounded-3xl p-7 sm:p-8 flex flex-col justify-between border border-white/10 hover:border-brand-accent/40 shadow-xl relative group transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-[#013565]/40 via-[#0e3775]/25 to-[#001124]/60">
+                  <div className="w-full h-full glass-panel rounded-3xl p-7 sm:p-8 flex flex-col justify-between border border-white/10 hover:border-brand-accent/40 shadow-xl relative group transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-[#013565]/40 via-[#0e3775]/25 to-[#001124]/60">
                     <div className="relative">
                       <Quote
                         size={32}

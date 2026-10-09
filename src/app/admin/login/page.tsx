@@ -2,22 +2,38 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 
 export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "EdC@admin@2026") {
-      // Set a cookie for the middleware
-      document.cookie = "edc_admin_auth=true; path=/; max-age=86400"; // 1 day
-      router.push("/admin");
-    } else {
+    setLoading(true);
+    setError(false);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        router.push("/admin");
+        router.refresh();
+      } else {
+        setError(true);
+        setTimeout(() => setError(false), 3000);
+      }
+    } catch {
       setError(true);
       setTimeout(() => setError(false), 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,7 +57,8 @@ export default function AdminLogin() {
               placeholder="Enter Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`w-full bg-black/20 border ${error ? 'border-red-500' : 'border-white/10 focus:border-brand-accent'} rounded-xl px-5 py-4 text-white focus:outline-none transition-colors text-center text-lg tracking-widest`}
+              disabled={loading}
+              className={`w-full bg-black/20 border ${error ? 'border-red-500' : 'border-white/10 focus:border-brand-accent'} rounded-xl px-5 py-4 text-white focus:outline-none transition-colors text-center text-lg tracking-widest disabled:opacity-50`}
               required
             />
             {error && <p className="text-red-400 text-sm mt-2 text-center">Incorrect password.</p>}
@@ -49,8 +66,10 @@ export default function AdminLogin() {
 
           <button 
             type="submit"
-            className="w-full bg-brand-accent hover:bg-brand-accent/90 text-[#013565] font-bold py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(56,189,248,0.3)] text-lg"
+            disabled={loading}
+            className="w-full bg-brand-accent hover:bg-brand-accent/90 text-[#013565] font-bold py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(56,189,248,0.3)] text-lg flex items-center justify-center gap-2 disabled:opacity-70"
           >
+            {loading && <Loader2 size={20} className="animate-spin" />}
             Unlock Dashboard
           </button>
         </form>

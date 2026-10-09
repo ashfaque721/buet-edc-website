@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import clsx from "clsx";
@@ -13,17 +13,14 @@ import Image from "next/image";
 export default function Gallery() {
   const containerRef = useRef<HTMLElement>(null);
   const { photos } = useGallery();
-  const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => setMounted(true), []);
 
   const homepagePhotos = photos.filter(p => p.showOnHomepage).slice(0, 5); // take up to 5 for the layout
 
   useEffect(() => {
-    if (typeof window === "undefined" || !mounted) return;
+    if (!containerRef.current) return;
     gsap.registerPlugin(ScrollTrigger);
     
-    let ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       gsap.from(".gallery-header", {
         scrollTrigger: { trigger: containerRef.current, start: "top 80%", once: true },
         y: 30, opacity: 0, duration: 0.8, ease: "power3.out"
@@ -36,7 +33,7 @@ export default function Gallery() {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [mounted]);
+  }, []);
 
   return (
     <section ref={containerRef} className="py-24 relative z-10 bg-brand-primary/50 backdrop-blur-sm border-y border-white/5 min-h-[480px]" id="gallery-section">

@@ -17,6 +17,7 @@ export default function AdminSponsorsPage() {
   const [tier, setTier] = useState("Past Sponsor");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,7 +39,7 @@ export default function AdminSponsorsPage() {
     setIsModalOpen(true);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -47,17 +48,27 @@ export default function AdminSponsorsPage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (typeof event.target?.result === "string") {
-        setLogoUrl(event.target.result);
-        toast.success("Logo preview loaded successfully");
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      toast.loading("Compressing & uploading logo...", { id: "upload-logo" });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      setLogoUrl(data.url);
+      toast.success("Logo compressed to WebP and saved!", { id: "upload-logo" });
+    } catch {
+      toast.error("Failed to upload image", { id: "upload-logo" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Please provide the company name");
@@ -73,7 +84,7 @@ export default function AdminSponsorsPage() {
 
     try {
       if (editingId) {
-        updateSponsor(editingId, {
+        await updateSponsor(editingId, {
           name,
           logoUrl,
           tier,
@@ -81,7 +92,7 @@ export default function AdminSponsorsPage() {
         });
         toast.success(`Updated ${name} sponsor details!`);
       } else {
-        addSponsor({
+        await addSponsor({
           name,
           logoUrl,
           tier,
@@ -181,7 +192,7 @@ export default function AdminSponsorsPage() {
 
         {sponsors.length === 0 && (
           <div className="col-span-full py-16 text-center text-white/50 bg-white/5 border border-white/10 rounded-2xl">
-            No sponsor logos found. Click "Add Sponsor Logo" to upload one.
+            No sponsor logos found. Click &quot;Add Sponsor Logo&quot; to upload one.
           </div>
         )}
       </div>
@@ -189,7 +200,7 @@ export default function AdminSponsorsPage() {
       {/* Add / Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#001833] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div data-lenis-prevent className="bg-[#001833] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-6 right-6 text-white/50 hover:text-white"
@@ -239,8 +250,8 @@ export default function AdminSponsorsPage() {
                 
                 <div className="flex gap-2 mb-2">
                   <input
-                    type="url"
-                    placeholder="https://... (or choose a file below)"
+                    type="text"
+                    placeholder="https://... (or choose a file to upload)"
                     value={logoUrl}
                     onChange={(e) => setLogoUrl(e.target.value)}
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent text-sm"
@@ -251,13 +262,15 @@ export default function AdminSponsorsPage() {
                     onChange={handleFileUpload}
                     accept="image/*"
                     className="hidden"
+                    disabled={isUploading}
                   />
                   <button
                     type="button"
+                    disabled={isUploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors"
+                    className="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/15 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors disabled:opacity-50"
                   >
-                    <Upload size={16} /> Browse
+                    <Upload size={16} /> {isUploading ? "Uploading..." : "Browse"}
                   </button>
                 </div>
 

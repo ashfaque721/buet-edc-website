@@ -1,0 +1,169 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Binary image store for compressed WebP assets
+model UploadedImage {
+  id        String   @id @default(cuid())
+  fileName  String
+  mimeType  String   @default("image/webp")
+  fileSize  Int
+  width     Int?
+  height    Int?
+  data      Bytes    @db.ByteA
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id           String               @id @default(cuid())
+  slug         String               @unique
+  title        String
+  date         DateTime
+  venue        String
+  category     String
+  status       String               @default("upcoming") // upcoming | past
+  isOpenForReg Boolean              @default(false)
+  regFee       Int                  @default(0) // 0 means Free
+  summary      String
+  description  String
+  fbLink       String?
+  bannerUrl    String?
+  timeline     EventTimelineItem[]
+  speakers     EventSpeaker[]
+  guests       EventGuest[]
+  attendees    EventRegistration[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model EventTimelineItem {
+  id       String @id @default(cuid())
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  time     String
+  activity String
+  order    Int    @default(0)
+}
+
+model EventSpeaker {
+  id          String  @id @default(cuid())
+  eventId     String
+  event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  designation String
+  photoUrl    String
+  order       Int     @default(0)
+}
+
+model EventGuest {
+  id          String  @id @default(cuid())
+  eventId     String
+  event       Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  designation String
+  photoUrl    String
+  order       Int     @default(0)
+}
+
+model EventRegistration {
+  id            String   @id @default(cuid())
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name          String
+  email         String
+  phone         String
+  institution   String
+  dept          String
+  studentId     String
+  year          String
+  paymentMethod String
+  trxId         String
+  status        String   @default("verified") // verified | pending | rejected
+  createdAt     DateTime @default(now())
+}
+
+model Executive {
+  id          String   @id @default(cuid())
+  name        String
+  designation String
+  wing        String
+  term        String   // current | past
+  photoUrl    String
+  facebook    String?
+  linkedin    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Partner {
+  id         String   @id @default(cuid())
+  name       String
+  type       String   // Incubation Partner, Title Sponsor, etc.
+  logoUrl    String
+  websiteUrl String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model Ambassador {
+  id        String   @id @default(cuid())
+  name      String
+  company   String
+  logoUrl   String?
+  photoUrl  String?
+  linkedin  String?
+  facebook  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Sponsor {
+  id         String   @id @default(cuid())
+  name       String
+  logoUrl    String
+  tier       String
+  websiteUrl String?
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model GalleryPhoto {
+  id             String   @id @default(cuid())
+  imageUrl       String
+  caption        String
+  eventDate      DateTime
+  eventName      String?
+  showOnHomepage Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  type        String   // PDF | Article
+  readingTime String
+  description String
+  link        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String   @default("unread") // unread | read
+  createdAt DateTime @default(now())
+}

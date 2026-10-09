@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import { mockData } from "@/lib/mock-data";
-import { Plus, Trash2, X, Building2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Trash2, X, Building2, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminAffiliationsPage() {
-  const [ambassadors, setAmbassadors] = useState(mockData.affiliations.ambassadors);
+  const [ambassadors, setAmbassadors] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [newAmbassador, setNewAmbassador] = useState({
     name: "",
     company: "",
@@ -17,34 +22,97 @@ export default function AdminAffiliationsPage() {
     facebook: "",
   });
 
-  const handleDelete = (id: string, name: string) => {
-    setAmbassadors(prev => prev.filter(ca => ca.id !== id));
-    toast.success(`Removed ${name} from affiliations`);
+  const fetchAffiliations = async () => {
+    try {
+      const res = await fetch("/api/affiliations");
+      if (res.ok) {
+        const data = await res.json();
+        setAmbassadors(data.ambassadors || []);
+        setPartners(data.partners || []);
+      }
+    } catch {
+      toast.error("Failed to load affiliations");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAdd = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchAffiliations();
+  }, []);
+
+  const handleUploadImage = async (
+    file: File,
+    target: "logo" | "photo"
+  ) => {
+    try {
+      if (target === "logo") setIsUploadingLogo(true);
+      else setIsUploadingPhoto(true);
+
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+
+      if (target === "logo") {
+        setNewAmbassador(prev => ({ ...prev, logoUrl: data.url }));
+        toast.success("Logo compressed to WebP and uploaded!");
+      } else {
+        setNewAmbassador(prev => ({ ...prev, photoUrl: data.url }));
+        toast.success("Photo compressed to WebP and uploaded!");
+      }
+    } catch {
+      toast.error("Failed to upload image");
+    } finally {
+      if (target === "logo") setIsUploadingLogo(false);
+      else setIsUploadingPhoto(false);
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (confirm(`Are you sure you want to remove ${name} from affiliations?`)) {
+      setAmbassadors(prev => prev.filter(ca => ca.id !== id));
+      try {
+        const res = await fetch(`/api/affiliations/${id}`, { method: "DELETE" });
+        if (!res.ok) throw new Error();
+        toast.success(`Removed ${name} from affiliations`);
+      } catch {
+        toast.error("Failed to delete ambassador");
+        fetchAffiliations();
+      }
+    }
+  };
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAmbassador.name || !newAmbassador.company) {
       toast.error("Please provide both ambassador name and company");
       return;
     }
 
-    const created = {
-      id: `ca-${Date.now()}`,
-      name: newAmbassador.name,
-      company: newAmbassador.company,
-      logoUrl: newAmbassador.logoUrl || "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=120&auto=format&fit=crop&q=80",
-      photoUrl: newAmbassador.photoUrl || `https://i.pravatar.cc/300?u=${Date.now()}`,
-      socials: {
-        linkedin: newAmbassador.linkedin || "#",
-        facebook: newAmbassador.facebook || "#",
-      }
-    };
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/affiliations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newAmbassador),
+      });
 
-    setAmbassadors(prev => [created, ...prev]);
-    setIsAddOpen(false);
-    setNewAmbassador({ name: "", company: "", logoUrl: "", photoUrl: "", linkedin: "", facebook: "" });
-    toast.success(`Added ${created.name} as Campus Ambassador for ${created.company}`);
+      if (!res.ok) throw new Error();
+      const created = await res.json();
+      setAmbassadors(prev => [created, ...prev]);
+      setIsAddOpen(false);
+      setNewAmbassador({ name: "", company: "", logoUrl: "", photoUrl: "", linkedin: "", facebook: "" });
+      toast.success(`Added ${created.name} as Campus Ambassador for ${created.company}`);
+    } catch {
+      toast.error("Failed to add ambassador");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -62,61 +130,71 @@ export default function AdminAffiliationsPage() {
         </button>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md">
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left min-w-[580px]">
-          <thead className="bg-white/5 border-b border-white/10">
-            <tr>
-              <th className="p-4 font-semibold text-white/70">Ambassador</th>
-              <th className="p-4 font-semibold text-white/70">Company / Partner</th>
-              <th className="p-4 font-semibold text-white/70">Company Logo</th>
-              <th className="p-4 font-semibold text-white/70 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ambassadors.map((ca) => (
-              <tr key={ca.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td className="p-4 flex items-center gap-3">
-                  <img src={ca.photoUrl} alt={ca.name} className="w-10 h-10 rounded-full object-cover bg-white/10 border border-white/10" />
-                  <span className="font-bold text-white">{ca.name}</span>
-                </td>
-                <td className="p-4 font-medium text-brand-accent">{ca.company}</td>
-                <td className="p-4">
-                  {ca.logoUrl ? (
-                    <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/15 p-1 flex items-center justify-center overflow-hidden">
-                      <img src={ca.logoUrl} alt={ca.company} className="w-full h-full object-cover rounded" />
-                    </div>
-                  ) : (
-                    <span className="text-white/30 text-xs italic">No logo</span>
-                  )}
-                </td>
-                <td className="p-4 text-right">
-                  <button 
-                    onClick={() => handleDelete(ca.id, ca.name)}
-                    className="p-2 text-red-400/60 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                    title="Delete Ambassador"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {ambassadors.length === 0 && (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-white/40">
-                  No campus ambassadors found. Click "Add Ambassador" to create one.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        </div>
+      {/* Grid of Ambassadors */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {ambassadors.map(ca => (
+          <div 
+            key={ca.id} 
+            className="group relative rounded-2xl bg-white/5 border border-white/10 p-5 hover:border-brand-accent/40 transition-all flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 p-1 flex items-center justify-center overflow-hidden">
+                    {ca.logoUrl ? (
+                      <img src={ca.logoUrl} alt={ca.company} className="w-full h-full object-contain" />
+                    ) : (
+                      <Building2 size={24} className="text-brand-accent" />
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-base leading-tight">{ca.company}</h3>
+                    <span className="text-xs text-brand-accent">Partner Entity</span>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => handleDelete(ca.id, ca.name)}
+                  className="p-2 text-white/40 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
+                  title="Remove Ambassador"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+
+              <div className="flex items-center gap-4 my-4 p-3 rounded-xl bg-black/20 border border-white/5">
+                <img 
+                  src={ca.photoUrl || "https://i.pravatar.cc/150"} 
+                  alt={ca.name} 
+                  className="w-12 h-12 rounded-full object-cover border border-white/10"
+                />
+                <div>
+                  <div className="font-bold text-sm text-white">{ca.name}</div>
+                  <div className="text-xs text-white/60">Campus Ambassador</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-3 border-t border-white/5 text-xs text-white/60">
+              {ca.linkedin && (
+                <a href={ca.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent transition-colors">
+                  LinkedIn
+                </a>
+              )}
+              {ca.facebook && (
+                <a href={ca.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-brand-accent transition-colors">
+                  • Facebook
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Add Ambassador Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#001833] border border-white/10 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div data-lenis-prevent className="bg-[#001124] border border-white/15 rounded-2xl w-full max-w-lg p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setIsAddOpen(false)}
               className="absolute top-6 right-6 text-white/50 hover:text-white"
@@ -151,33 +229,45 @@ export default function AdminAffiliationsPage() {
                 />
               </div>
 
+              {/* Logo Upload with Sharp Compression */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">Company Logo Image URL</label>
-                <input 
-                  type="url" 
-                  placeholder="https://..."
-                  value={newAmbassador.logoUrl}
-                  onChange={e => setNewAmbassador({...newAmbassador, logoUrl: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent text-sm" 
-                />
+                <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">Company Logo</label>
+                <div className="flex items-center gap-3">
+                  {newAmbassador.logoUrl && (
+                    <img src={newAmbassador.logoUrl} alt="" className="w-10 h-10 object-contain rounded-lg bg-white/5 border border-white/10 p-1" />
+                  )}
+                  <label className="flex-1 border-2 border-dashed border-white/20 hover:border-brand-accent rounded-xl p-2.5 flex items-center justify-center gap-2 cursor-pointer transition-colors bg-white/5">
+                    <Upload size={14} className="text-brand-accent" />
+                    <span className="text-xs font-semibold text-white/80">
+                      {isUploadingLogo ? "Compressing..." : "Upload Logo (Auto WebP)"}
+                    </span>
+                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleUploadImage(e.target.files[0], "logo")} className="hidden" disabled={isUploadingLogo} />
+                  </label>
+                </div>
               </div>
 
+              {/* Photo Upload with Sharp Compression */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">Ambassador Photo URL</label>
-                <input 
-                  type="url" 
-                  placeholder="https://images.unsplash.com/..."
-                  value={newAmbassador.photoUrl}
-                  onChange={e => setNewAmbassador({...newAmbassador, photoUrl: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-accent text-sm" 
-                />
+                <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">Ambassador Portrait Photo</label>
+                <div className="flex items-center gap-3">
+                  {newAmbassador.photoUrl && (
+                    <img src={newAmbassador.photoUrl} alt="" className="w-10 h-10 object-cover rounded-full bg-white/5 border border-white/10" />
+                  )}
+                  <label className="flex-1 border-2 border-dashed border-white/20 hover:border-brand-accent rounded-xl p-2.5 flex items-center justify-center gap-2 cursor-pointer transition-colors bg-white/5">
+                    <Upload size={14} className="text-brand-accent" />
+                    <span className="text-xs font-semibold text-white/80">
+                      {isUploadingPhoto ? "Compressing..." : "Upload Photo (Auto WebP)"}
+                    </span>
+                    <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleUploadImage(e.target.files[0], "photo")} className="hidden" disabled={isUploadingPhoto} />
+                  </label>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">LinkedIn Profile URL</label>
                   <input 
-                    type="url" 
+                    type="text" 
                     placeholder="https://linkedin.com/in/..."
                     value={newAmbassador.linkedin}
                     onChange={e => setNewAmbassador({...newAmbassador, linkedin: e.target.value})}
@@ -187,7 +277,7 @@ export default function AdminAffiliationsPage() {
                 <div>
                   <label className="block text-xs font-semibold text-white/70 uppercase mb-1.5">Facebook Profile URL</label>
                   <input 
-                    type="url" 
+                    type="text" 
                     placeholder="https://facebook.com/..."
                     value={newAmbassador.facebook}
                     onChange={e => setNewAmbassador({...newAmbassador, facebook: e.target.value})}
@@ -199,8 +289,10 @@ export default function AdminAffiliationsPage() {
               <div className="pt-2">
                 <button 
                   type="submit"
-                  className="w-full bg-brand-accent text-[#013565] font-bold py-3 rounded-xl hover:brightness-110 transition-all text-sm"
+                  disabled={isSubmitting}
+                  className="w-full bg-brand-accent text-[#013565] font-bold py-3 rounded-xl hover:brightness-110 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
+                  {isSubmitting && <Loader2 size={16} className="animate-spin" />}
                   Save Ambassador
                 </button>
               </div>

@@ -67,7 +67,7 @@ export default function ImpactMetrics() {
             <div key={metric.id} className="metric-card h-full flex flex-col">
               <SpotlightCard
                 spotlightColor="rgba(56, 189, 248, 0.22)"
-                className="glass-panel !border-white/10 !bg-transparent rounded-3xl p-8 sm:p-9 flex flex-col items-center justify-between text-center h-full min-h-[260px] transform transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-accent/50 shadow-[0_8px_32px_0_rgba(1,53,101,0.37)]"
+                className="glass-panel border-white/10! bg-transparent! rounded-3xl p-8 sm:p-9 flex flex-col items-center justify-between text-center h-full min-h-65 transform transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-accent/50 shadow-[0_8px_32px_0_rgba(1,53,101,0.37)]"
               >
                 <div className="w-16 h-16 rounded-2xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center mb-6 text-brand-accent shadow-[0_0_20px_rgba(56,189,248,0.15)]">
                   <metric.icon size={30} />

@@ -19,6 +19,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Resources", href: "/admin/resources", icon: Library },
   ];
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {}
+    document.cookie = "edc_admin_auth=; path=/; max-age=0";
+    window.location.href = "/admin/login";
+  };
+
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
@@ -42,10 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <button 
-          onClick={() => {
-            document.cookie = "edc_admin_auth=; path=/; max-age=0";
-            window.location.href = "/admin/login";
-          }}
+          onClick={handleLogout}
           className="p-2 text-white/50 hover:text-red-400 bg-white/5 rounded-lg border border-white/10 transition-colors"
           title="Logout"
         >
@@ -75,10 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="font-bold text-lg tracking-tight">Admin</span>
             </div>
             <button 
-              onClick={() => {
-                document.cookie = "edc_admin_auth=; path=/; max-age=0";
-                window.location.href = "/admin/login";
-              }}
+              onClick={handleLogout}
               className="p-2 text-white/50 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors"
               title="Logout"
             >

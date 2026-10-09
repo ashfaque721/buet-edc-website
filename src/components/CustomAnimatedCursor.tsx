@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 export default function CustomAnimatedCursor() {
-  const [mounted, setMounted] = useState(false);
+  const isFinePointer = useSyncExternalStore(
+    (callback) => {
+      const mq = window.matchMedia("(pointer: fine)");
+      mq.addEventListener("change", callback);
+      return () => mq.removeEventListener("change", callback);
+    },
+    () => !window.matchMedia("(pointer: coarse)").matches && window.matchMedia("(pointer: fine)").matches,
+    () => false
+  );
+
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -19,14 +28,9 @@ export default function CustomAnimatedCursor() {
   const isInitialMove = useRef(true);
 
   useEffect(() => {
-    // Only enable on devices with a mouse/trackpad
-    if (typeof window === "undefined") return;
-    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
-    const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-    if (isCoarse || !hasFinePointer) return;
+    if (!isFinePointer) return;
 
     document.documentElement.classList.add("custom-cursor-active");
-    setMounted(true);
 
     const onMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
@@ -104,9 +108,9 @@ export default function CustomAnimatedCursor() {
       document.removeEventListener("mouseenter", onMouseEnter);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
-  }, []);
+  }, [isFinePointer]);
 
-  if (!mounted) return null;
+  if (!isFinePointer) return null;
 
   return (
     <div
@@ -134,7 +138,7 @@ export default function CustomAnimatedCursor() {
         className="pointer-events-none fixed top-0 left-0 will-change-transform"
       >
         <div
-          className="h-[38px] w-[38px] -ml-[19px] -mt-[19px] rounded-full"
+          className="h-9.5 w-9.5 -ml-4.75 -mt-4.75 rounded-full"
           style={{
             border: "1.5px solid rgba(255, 255, 255, 0.75)",
             backgroundColor: isHovered

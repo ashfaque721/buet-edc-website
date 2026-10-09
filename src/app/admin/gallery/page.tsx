@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useGallery, GalleryPhoto } from "@/context/GalleryContext";
-import { Plus, Trash2, Edit3, Image as ImageIcon, CheckCircle, X } from "lucide-react";
+import { Plus, Trash2, Edit3, Image as ImageIcon, CheckCircle, X, Loader2 } from "lucide-react";
 
 export default function AdminGalleryPage() {
   const { photos, addPhoto, updatePhoto, deletePhoto, toggleHomepage } = useGallery();
@@ -47,7 +47,9 @@ export default function AdminGalleryPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!imageUrl || !caption || !eventDate) {
       showToast("Please fill in all required fields.", "error");
@@ -55,11 +57,10 @@ export default function AdminGalleryPage() {
     }
 
     if (editingId) {
-      updatePhoto(editingId, { imageUrl, caption, eventDate, eventName, showOnHomepage });
+      await updatePhoto(editingId, { imageUrl, caption, eventDate, eventName, showOnHomepage });
       showToast("Photo updated successfully!");
     } else {
-      addPhoto({
-        id: `photo-${Date.now()}`,
+      await addPhoto({
         imageUrl,
         caption,
         eventDate,
@@ -80,15 +81,28 @@ export default function AdminGalleryPage() {
     }
   };
 
-  // Convert local file to base64 for preview
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload image to server pipeline (compresses to WebP & stores in DB)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) throw new Error("Upload failed");
+        const data = await res.json();
+        setImageUrl(data.url);
+        showToast("Image compressed to WebP and uploaded!");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to upload image.", "error");
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -170,14 +184,14 @@ export default function AdminGalleryPage() {
 
       {/* Upload/Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#001124]/80 backdrop-blur-sm">
-          <div className="bg-[#001124] border border-white/10 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#001124]/80 backdrop-blur-sm overflow-y-auto">
+          <div data-lenis-prevent className="bg-[#001124] border border-white/10 rounded-3xl w-full max-w-xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col my-auto">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5 shrink-0">
               <h2 className="text-xl font-bold">{editingId ? 'Edit Photo' : 'Upload New Photo'}</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-white/50 hover:text-white"><X size={20}/></button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+            <form onSubmit={handleSubmit} data-lenis-prevent className="p-6 space-y-5 overflow-y-auto flex-1">
               
               {/* Image Preview / Upload */}
               <div>
@@ -185,10 +199,10 @@ export default function AdminGalleryPage() {
                 <div className="flex gap-4 items-end">
                   <div className="flex-1">
                     <input 
-                      type="url" 
+                      type="text" 
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
-                      placeholder="https://..."
+                      placeholder="Paste Image URL or upload from device below"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-brand-accent focus:outline-none text-sm mb-2"
                     />
                     <div className="relative w-full">
@@ -196,10 +210,21 @@ export default function AdminGalleryPage() {
                         type="file" 
                         accept="image/*"
                         onChange={handleFileUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        disabled={isUploading}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                       />
-                      <div className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-3 text-white/50 text-sm flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
-                        <ImageIcon size={16} /> Or upload from device (Base64)
+                      <div className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-3 text-white/70 text-sm flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
+                        {isUploading ? (
+                          <>
+                            <Loader2 size={16} className="animate-spin text-brand-accent" />
+                            <span>Compressing & Uploading to WebP...</span>
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon size={16} className="text-brand-accent" />
+                            <span>Upload from device (Auto WebP compression)</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -256,9 +281,13 @@ export default function AdminGalleryPage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex justify-end gap-3">
+              <div className="pt-4 border-t border-white/10 flex justify-end gap-3 shrink-0">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-xl font-semibold text-white/70 hover:bg-white/10 transition-colors">Cancel</button>
-                <button type="submit" className="px-6 py-2.5 rounded-xl font-bold bg-brand-accent text-[#013565] hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+                <button 
+                  type="submit" 
+                  disabled={isUploading}
+                  className="px-6 py-2.5 rounded-xl font-bold bg-brand-accent text-[#013565] hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(56,189,248,0.3)] disabled:opacity-50"
+                >
                   {editingId ? 'Save Changes' : 'Upload Photo'}
                 </button>
               </div>

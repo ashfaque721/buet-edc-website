@@ -1,23 +1,23 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 
 export default function InitialPreloader() {
-  const [shouldRender, setShouldRender] = useState(false);
+  const isFirstVisit = useSyncExternalStore(
+    () => () => {},
+    () => !sessionStorage.getItem("edc_preloader_viewed"),
+    () => false
+  );
+  const [dismissed, setDismissed] = useState(false);
+  const shouldRender = isFirstVisit && !dismissed;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const circleProgressRef = useRef<SVGCircleElement>(null);
   const logoRingRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const hasViewed = sessionStorage.getItem("edc_preloader_viewed");
-    if (!hasViewed) {
-      setShouldRender(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (!shouldRender || !containerRef.current) return;
@@ -53,7 +53,7 @@ export default function InitialPreloader() {
           
           // Smooth curtain reveal upward and scale out
           gsap.timeline({
-            onComplete: () => setShouldRender(false),
+            onComplete: () => setDismissed(true),
           })
             .to(logoRingRef.current, {
               scale: 1.1,
@@ -95,17 +95,17 @@ export default function InitialPreloader() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] bg-[#020b18] flex flex-col items-center justify-center p-6 select-none overflow-hidden"
+      className="fixed inset-0 z-9999 bg-[#020b18] flex flex-col items-center justify-center p-6 select-none overflow-hidden"
     >
       {/* Background ambient radial gradients */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-accent/10 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#013565]/40 rounded-full blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-brand-accent/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-75 h-75 bg-brand-primary/40 rounded-full blur-[80px]" />
       </div>
 
       {/* Top subtle HUD watermark */}
       <div className="absolute top-8 left-8 sm:top-12 sm:left-12 flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#38bdf8] animate-ping" />
+        <div className="w-1.5 h-1.5 rounded-full bg-brand-accent animate-ping" />
         <span className="font-mono text-[11px] sm:text-xs text-white/40 tracking-[0.25em] uppercase">
           BUET EDC // PORTAL BOOT
         </span>
@@ -147,7 +147,7 @@ export default function InitialPreloader() {
           {/* Inner Glowing Glass Circle with BUET EDC Logo */}
           <div
             ref={logoRingRef}
-            className="w-28 h-28 sm:w-34 sm:h-34 rounded-full border border-white/15 bg-gradient-to-br from-[#013565]/70 to-[#001124]/90 backdrop-blur-2xl flex items-center justify-center p-5 shadow-[0_0_35px_rgba(56,189,248,0.2)]"
+            className="w-28 h-28 sm:w-34 sm:h-34 rounded-full border border-white/15 bg-linear-to-br from-brand-primary/70 to-[#001124]/90 backdrop-blur-2xl flex items-center justify-center p-5 shadow-[0_0_35px_rgba(56,189,248,0.2)]"
           >
             <Image
               src="/logo-light.png"
@@ -171,13 +171,13 @@ export default function InitialPreloader() {
           <div className="w-48 sm:w-56 h-1 bg-white/10 rounded-full overflow-hidden p-0.5 mb-3 border border-white/5">
             <div
               ref={progressBarRef}
-              className="h-full bg-gradient-to-r from-[#013565] via-[#38bdf8] to-white rounded-full transition-all duration-75 ease-linear shadow-[0_0_12px_#38bdf8]"
+              className="h-full bg-linear-to-r from-brand-primary via-brand-accent to-white rounded-full transition-all duration-75 ease-linear shadow-[0_0_12px_#38bdf8]"
               style={{ width: "0%" }}
             />
           </div>
 
           {/* Counter percentage */}
-          <div className="flex items-baseline font-mono text-[#38bdf8]">
+          <div className="flex items-baseline font-mono text-brand-accent">
             <span ref={counterRef} className="text-xl sm:text-2xl font-bold tabular-nums">
               0
             </span>

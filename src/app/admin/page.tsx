@@ -1,15 +1,42 @@
 "use client";
 
-import React from "react";
-import { mockData } from "@/lib/mock-data";
-import { Calendar, Users, FileText, Activity } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Calendar, Users, FileText, Activity, Loader2 } from "lucide-react";
 
 export default function AdminDashboard() {
+  const [data, setData] = useState<{
+    stats: {
+      totalEvents: number;
+      activeRegistrations: number;
+      totalResources: number;
+      currentExecutives: number;
+    };
+    recentRegistrations: any[];
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/admin/stats");
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+      } catch (err) {
+        console.error("Failed to fetch admin stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const stats = [
-    { label: "Total Events", value: mockData.events.length, icon: Calendar, color: "text-blue-400" },
-    { label: "Active Registrations", value: mockData.events.reduce((acc, e) => acc + (e.attendees?.length || 0), 0), icon: Activity, color: "text-green-400" },
-    { label: "Total Resources", value: mockData.resources.length, icon: FileText, color: "text-purple-400" },
-    { label: "Current Executives", value: mockData.executives.filter(e => e.term === "current").length, icon: Users, color: "text-brand-accent" }
+    { label: "Total Events", value: data?.stats.totalEvents ?? 0, icon: Calendar, color: "text-blue-400" },
+    { label: "Active Registrations", value: data?.stats.activeRegistrations ?? 0, icon: Activity, color: "text-green-400" },
+    { label: "Total Resources", value: data?.stats.totalResources ?? 0, icon: FileText, color: "text-purple-400" },
+    { label: "Current Executives", value: data?.stats.currentExecutives ?? 0, icon: Users, color: "text-brand-accent" }
   ];
 
   return (
@@ -27,7 +54,9 @@ export default function AdminDashboard() {
                   <Icon size={24} />
                 </div>
               </div>
-              <div className="text-3xl font-bold mb-1">{stat.value}</div>
+              <div className="text-3xl font-bold mb-1">
+                {loading ? <Loader2 size={24} className="animate-spin text-white/40" /> : stat.value}
+              </div>
               <div className="text-sm text-white/60 font-medium uppercase tracking-wider">{stat.label}</div>
             </div>
           );
@@ -44,18 +73,31 @@ export default function AdminDashboard() {
                 <th className="p-4 font-semibold text-white/70">Name</th>
                 <th className="p-4 font-semibold text-white/70">Event</th>
                 <th className="p-4 font-semibold text-white/70">Institution</th>
-                <th className="p-4 font-semibold text-white/70">Date</th>
+                <th className="p-4 font-semibold text-white/70">Registered At</th>
               </tr>
             </thead>
             <tbody>
-              {mockData.events.flatMap(e => e.attendees?.map(a => ({ ...a, eventName: e.title })) || []).slice(0, 5).map((att, i) => (
-                <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="p-4 font-medium">{att.name}</td>
-                  <td className="p-4 text-brand-accent">{att.eventName}</td>
-                  <td className="p-4 text-white/70">{att.institution}</td>
-                  <td className="p-4 text-white/50">Just now</td>
+              {data?.recentRegistrations && data.recentRegistrations.length > 0 ? (
+                data.recentRegistrations.map((att: any, i: number) => (
+                  <tr key={att.id || i} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <td className="p-4 font-medium">
+                      <div>{att.name}</div>
+                      <div className="text-xs text-white/50">{att.email}</div>
+                    </td>
+                    <td className="p-4 text-brand-accent">{att.eventName}</td>
+                    <td className="p-4 text-white/70">{att.institution}</td>
+                    <td className="p-4 text-white/50 text-sm">
+                      {att.createdAt ? new Date(att.createdAt).toLocaleDateString() : "Recently"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="p-8 text-center text-white/40">
+                    {loading ? "Loading registrations..." : "No registrations found."}
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

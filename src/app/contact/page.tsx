@@ -3,25 +3,42 @@
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import StickyFooterReveal from "@/components/StickyFooterReveal";
-import { Mail, MapPin, CheckCircle } from "lucide-react";
+import { Mail, MapPin, CheckCircle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { FacebookIcon, LinkedinIcon } from "@/components/Icons";
+import { FacebookIcon, LinkedinIcon, InstagramIcon } from "@/components/Icons";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      (e.target as HTMLFormElement).reset();
+
+    const form = e.currentTarget;
+    const inputs = form.elements as any;
+    const name = inputs[0].value;
+    const email = inputs[1].value;
+    const subject = inputs[2].value;
+    const message = inputs[3].value;
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      form.reset();
       toast.success("Message Sent Successfully!", {
         description: "We'll get back to you as soon as possible."
       });
-    }, 1500);
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -34,37 +51,87 @@ export default function ContactPage() {
           {/* Left: Info */}
           <div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">Let's <span className="text-brand-accent">Connect</span></h1>
-            <p className="text-xl text-white/80 mb-12 leading-relaxed">
-              Have an idea? Want to partner with us? Or just want to say hi? We'd love to hear from you. Drop us a message!
+            <p className="text-xl text-white/80 mb-10 leading-relaxed">
+              Have an idea? Want to partner with us? Or just want to reach out? We'd love to hear from you across any of our official channels!
             </p>
 
-            <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="bg-brand-accent/20 p-4 rounded-2xl text-brand-accent">
-                  <Mail size={24} />
+            <div className="space-y-6">
+              {/* Official Email */}
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-brand-accent/40 transition-colors">
+                <div className="bg-brand-accent/20 p-3.5 rounded-xl text-brand-accent shrink-0">
+                  <Mail size={22} />
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white/60 mb-1 uppercase tracking-wide text-sm">Official Email</h3>
-                  <a href="mailto:edcbuet@gmail.com" className="text-xl sm:text-2xl font-semibold hover:text-brand-accent transition-colors break-all">edcbuet@gmail.com</a>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-semibold text-white/60 mb-0.5 uppercase tracking-wider">Official Email</h3>
+                  <a href="mailto:buet.edc@gmail.com" className="text-base sm:text-lg font-bold text-white hover:text-brand-accent transition-colors break-all">
+                    buet.edc@gmail.com
+                  </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="bg-brand-accent/20 p-4 rounded-2xl text-brand-accent">
-                  <MapPin size={24} />
+              {/* Facebook Page */}
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#1877f2]/50 transition-colors">
+                <div className="bg-[#1877f2]/20 p-3.5 rounded-xl text-[#1877f2] shrink-0">
+                  <FacebookIcon size={22} />
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white/60 mb-1 uppercase tracking-wide text-sm">Campus Address</h3>
-                  <div className="text-xl font-semibold">BUET, Dhaka-1000<br/>Bangladesh</div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-semibold text-white/60 mb-0.5 uppercase tracking-wider">Facebook Page</h3>
+                  <a 
+                    href="https://www.facebook.com/BUET.EDC" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-base sm:text-lg font-bold text-white hover:text-[#1877f2] transition-colors break-all flex items-center gap-1.5"
+                  >
+                    facebook.com/BUET.EDC <ExternalLink size={14} className="text-[#1877f2] shrink-0" />
+                  </a>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-16 pt-8 border-t border-white/10">
-              <h3 className="text-sm font-bold text-white/60 mb-4 uppercase tracking-wide">Follow Our Journey</h3>
-              <div className="flex gap-4">
-                <a href="#" className="bg-white/5 p-4 rounded-xl hover:bg-[#1877f2] hover:text-white transition-all"><FacebookIcon size={24} /></a>
-                <a href="#" className="bg-white/5 p-4 rounded-xl hover:bg-[#0a66c2] hover:text-white transition-all"><LinkedinIcon size={24} /></a>
+              {/* LinkedIn Page */}
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#0a66c2]/50 transition-colors">
+                <div className="bg-[#0a66c2]/20 p-3.5 rounded-xl text-[#0a66c2] shrink-0">
+                  <LinkedinIcon size={22} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-semibold text-white/60 mb-0.5 uppercase tracking-wider">LinkedIn Page</h3>
+                  <a 
+                    href="https://www.linkedin.com/company/buet-entrepreneurship-development-club/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-base sm:text-lg font-bold text-white hover:text-brand-accent transition-colors break-all flex items-center gap-1.5"
+                  >
+                    BUET EDC on LinkedIn <ExternalLink size={14} className="text-brand-accent shrink-0" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Instagram Page */}
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#e1306c]/50 transition-colors">
+                <div className="bg-gradient-to-tr from-[#f09433]/20 via-[#dc2743]/20 to-[#bc1888]/20 p-3.5 rounded-xl text-[#f43f5e] shrink-0">
+                  <InstagramIcon size={22} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs font-semibold text-white/60 mb-0.5 uppercase tracking-wider">Instagram</h3>
+                  <a 
+                    href="https://www.instagram.com/edc_buet/?hl=en" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-base sm:text-lg font-bold text-white hover:text-[#f43f5e] transition-colors break-all flex items-center gap-1.5"
+                  >
+                    instagram.com/edc_buet <ExternalLink size={14} className="text-[#f43f5e] shrink-0" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Campus Address */}
+              <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="bg-brand-accent/20 p-3.5 rounded-xl text-brand-accent shrink-0">
+                  <MapPin size={22} />
+                </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-white/60 mb-0.5 uppercase tracking-wider">Campus Address</h3>
+                  <div className="text-base sm:text-lg font-bold text-white/90">BUET, Dhaka-1000, Bangladesh</div>
+                </div>
               </div>
             </div>
           </div>

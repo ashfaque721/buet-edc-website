@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
-import { mockData } from "@/lib/mock-data";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const { id } = params;
 
   try {
-    const event = mockData.events.find((e) => e.id === id);
+    const event = await prisma.event.findFirst({
+      where: {
+        OR: [{ id }, { slug: id }],
+      },
+      include: {
+        attendees: {
+          orderBy: { createdAt: "desc" },
+        },
+      },
+    });
 
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
@@ -30,6 +39,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       { header: "Year", key: "year", width: 14 },
       { header: "Payment Method", key: "paymentMethod", width: 16 },
       { header: "Transaction ID", key: "trxId", width: 20 },
+      { header: "Registration Date", key: "createdAt", width: 22 },
     ];
 
     // Style the header row
@@ -43,19 +53,19 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     headerRow.alignment = { vertical: "middle", horizontal: "center" };
 
     // Add rows
-    if (event.attendees) {
+    if (event.attendees && event.attendees.length > 0) {
       event.attendees.forEach((att) => {
-        const anyAtt = att as any;
         sheet.addRow({
           name: att.name,
           email: att.email,
           phone: att.phone,
           institution: att.institution,
           dept: att.dept,
-          studentId: anyAtt.studentId || "2105001",
-          year: anyAtt.year || "4th Year",
-          paymentMethod: anyAtt.paymentMethod || "bKash",
-          trxId: anyAtt.trxId || "N/A",
+          studentId: att.studentId,
+          year: att.year,
+          paymentMethod: att.paymentMethod,
+          trxId: att.trxId,
+          createdAt: new Date(att.createdAt).toLocaleString(),
         });
       });
     }

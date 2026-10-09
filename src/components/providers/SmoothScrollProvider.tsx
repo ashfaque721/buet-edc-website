@@ -9,8 +9,17 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
   const pathname = usePathname();
 
   useEffect(() => {
-    // Disable smooth scrolling on mobile / touch devices to preserve native momentum and prevent ScrollTrigger lag
-    if (typeof window === "undefined" || window.innerWidth < 768 || window.matchMedia("(pointer: coarse)").matches) {
+    // Disable smooth scrolling on mobile / touch devices or admin dashboard to allow native scrolling and modal interaction
+    if (
+      typeof window === "undefined" ||
+      window.innerWidth < 768 ||
+      window.matchMedia("(pointer: coarse)").matches ||
+      pathname?.startsWith("/admin")
+    ) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
       return;
     }
 
@@ -35,7 +44,7 @@ export default function SmoothScrollProvider({ children }: { children: ReactNode
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (lenisRef.current) {

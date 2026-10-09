@@ -8,137 +8,121 @@ export interface Sponsor {
   logoUrl: string;
   tier: string; // e.g. "Title Sponsor", "Gold Sponsor", "Incubation Partner", "Ecosystem Partner", "Strategic Partner"
   websiteUrl?: string;
+  order?: number;
 }
-
-export const INITIAL_SPONSORS: Sponsor[] = [
-  {
-    id: "sp-1",
-    name: "Walton",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Walton_Group_logo.svg/320px-Walton_Group_logo.svg.png",
-    tier: "Title Sponsor",
-    websiteUrl: "https://waltonbd.com",
-  },
-  {
-    id: "sp-2",
-    name: "10 Minute School",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/10_Minute_School_Logo.svg/320px-10_Minute_School_Logo.svg.png",
-    tier: "Incubation Partner",
-    websiteUrl: "https://10minuteschool.com",
-  },
-  {
-    id: "sp-3",
-    name: "bKash",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/BKash_Logo.svg/320px-BKash_Logo.svg.png",
-    tier: "Fintech Partner",
-    websiteUrl: "https://bkash.com",
-  },
-  {
-    id: "sp-4",
-    name: "Grameenphone",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Grameenphone_logo.svg/320px-Grameenphone_logo.svg.png",
-    tier: "Telecom Partner",
-    websiteUrl: "https://grameenphone.com",
-  },
-  {
-    id: "sp-5",
-    name: "Pathao",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Pathao_logo.svg/320px-Pathao_logo.svg.png",
-    tier: "Mobility Partner",
-    websiteUrl: "https://pathao.com",
-  },
-  {
-    id: "sp-6",
-    name: "Unilever",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Unilever.svg/320px-Unilever.svg.png",
-    tier: "FMCG Partner",
-    websiteUrl: "https://unilever.com.bd",
-  },
-  {
-    id: "sp-7",
-    name: "Robi Axiata",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Robi_logo.svg/320px-Robi_logo.svg.png",
-    tier: "Digital Partner",
-    websiteUrl: "https://robi.com.bd",
-  },
-  {
-    id: "sp-8",
-    name: "Brain Station 23",
-    logoUrl: "https://brainstation-23.com/wp-content/uploads/2021/04/Brain-Station-23-Logo.png",
-    tier: "Tech Sponsor",
-    websiteUrl: "https://brainstation-23.com",
-  },
-];
-
-const STORAGE_KEY = "buet_edc_past_sponsors_v2";
 
 interface SponsorsContextType {
   sponsors: Sponsor[];
-  addSponsor: (sponsor: Omit<Sponsor, "id">) => void;
-  updateSponsor: (id: string, updates: Partial<Omit<Sponsor, "id">>) => void;
-  deleteSponsor: (id: string) => void;
+  loading: boolean;
+  addSponsor: (sponsor: Omit<Sponsor, "id">) => Promise<Sponsor | null>;
+  updateSponsor: (id: string, updates: Partial<Omit<Sponsor, "id">>) => Promise<void>;
+  deleteSponsor: (id: string) => Promise<void>;
+  refreshSponsors: () => Promise<void>;
 }
 
 const SponsorsContext = createContext<SponsorsContextType | undefined>(undefined);
 
-export function SponsorsProvider({ children }: { children: React.ReactNode }) {
-  const [sponsors, setSponsors] = useState<Sponsor[]>(INITIAL_SPONSORS);
-  const [isLoaded, setIsLoaded] = useState(false);
+async function getSponsorsData(): Promise<Sponsor[]> {
+  const res = await fetch("/api/sponsors");
+  if (!res.ok) throw new Error("Failed to fetch sponsors");
+  return res.json();
+}
 
-  useEffect(() => {
+export function SponsorsProvider({ children }: { children: React.ReactNode }) {
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSponsors = React.useCallback(async () => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setSponsors(parsed);
-        } else {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SPONSORS));
-        }
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SPONSORS));
-      }
+      const data = await getSponsorsData();
+      setSponsors(data);
     } catch (e) {
-      console.warn("Failed to read sponsors from localStorage:", e);
+      console.error("Failed to fetch sponsors:", e);
     } finally {
-      setIsLoaded(true);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
+    let isMounted = true;
+
+    async function init() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(sponsors));
+        const data = await getSponsorsData();
+        if (isMounted) {
+          setSponsors(data);
+        }
       } catch (e) {
-        console.warn("Failed to persist sponsors to localStorage:", e);
+        console.error("Failed to fetch sponsors:", e);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
-  }, [sponsors, isLoaded]);
 
-  const addSponsor = (sponsor: Omit<Sponsor, "id">) => {
-    const newEntry: Sponsor = {
-      ...sponsor,
-      id: `sp-${Date.now()}`,
+    init();
+
+    return () => {
+      isMounted = false;
     };
-    setSponsors(prev => [newEntry, ...prev]);
+  }, []);
+
+  const addSponsor = async (sponsor: Omit<Sponsor, "id">): Promise<Sponsor | null> => {
+    try {
+      const res = await fetch("/api/sponsors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sponsor),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setSponsors((prev) => [created, ...prev]);
+        return created;
+      }
+    } catch (e) {
+      console.error("Failed to add sponsor:", e);
+    }
+    return null;
   };
 
-  const updateSponsor = (id: string, updates: Partial<Omit<Sponsor, "id">>) => {
-    setSponsors(prev =>
-      prev.map(sp => (sp.id === id ? { ...sp, ...updates } : sp))
+  const updateSponsor = async (id: string, updates: Partial<Omit<Sponsor, "id">>) => {
+    setSponsors((prev) =>
+      prev.map((sp) => (sp.id === id ? { ...sp, ...updates } : sp))
     );
+    try {
+      await fetch(`/api/sponsors/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+    } catch (e) {
+      console.error("Failed to update sponsor:", e);
+      fetchSponsors();
+    }
   };
 
-  const deleteSponsor = (id: string) => {
-    setSponsors(prev => prev.filter(sp => sp.id !== id));
+  const deleteSponsor = async (id: string) => {
+    setSponsors((prev) => prev.filter((sp) => sp.id !== id));
+    try {
+      await fetch(`/api/sponsors/${id}`, {
+        method: "DELETE",
+      });
+    } catch (e) {
+      console.error("Failed to delete sponsor:", e);
+      fetchSponsors();
+    }
   };
 
   return (
     <SponsorsContext.Provider
       value={{
         sponsors,
+        loading,
         addSponsor,
         updateSponsor,
         deleteSponsor,
+        refreshSponsors: fetchSponsors,
       }}
     >
       {children}

@@ -230,16 +230,16 @@ export default function Navbar() {
               {/* Footer info: Email & Socials */}
               <div className="flex flex-col items-center gap-3 text-center">
                 <a
-                  href="mailto:edcbuet@gmail.com"
+                  href="mailto:buet.edc@gmail.com"
                   className="flex items-center gap-2 text-xs sm:text-sm text-white/60 hover:text-[#38bdf8] transition-colors font-mono"
                 >
                   <Mail size={14} className="text-[#38bdf8]" />
-                  edcbuet@gmail.com
+                  buet.edc@gmail.com
                 </a>
 
                 <div className="flex items-center gap-3">
                   <a
-                    href="https://facebook.com/buetedc"
+                    href="https://www.facebook.com/BUET.EDC"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Facebook"
@@ -259,7 +259,7 @@ export default function Navbar() {
                     </svg>
                   </a>
                   <a
-                    href="https://linkedin.com/company/buetedc"
+                    href="https://www.linkedin.com/company/buet-entrepreneurship-development-club/"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn"
@@ -278,6 +278,28 @@ export default function Navbar() {
                       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
                       <rect x="2" y="9" width="4" height="12"></rect>
                       <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                  </a>
+                  <a
+                    href="https://www.instagram.com/edc_buet/?hl=en"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                    className="w-8 h-8 rounded-full border border-white/10 bg-white/5 hover:bg-white/15 flex items-center justify-center text-white/70 hover:text-[#38bdf8] transition-colors"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                     </svg>
                   </a>
                 </div>

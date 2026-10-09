@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedGalleryPhotos, createGalleryPhoto } from "@/lib/services/gallery";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const photoSchema = z.object({
   imageUrl: z.string().min(1),
   caption: z.string().min(1),

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedEvents, createEvent } from "@/lib/services/events";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const createEventSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedAffiliations, createAmbassador } from "@/lib/services/affiliations";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const ambassadorSchema = z.object({
   name: z.string().min(1),
   company: z.string().min(1),

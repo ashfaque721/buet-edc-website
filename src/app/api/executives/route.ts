@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedExecutives, createExecutive } from "@/lib/services/executives";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const execSchema = z.object({
   name: z.string().min(1),
   designation: z.string().min(1),

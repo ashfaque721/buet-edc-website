@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedSponsors, createSponsor } from "@/lib/services/sponsors";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const sponsorSchema = z.object({
   name: z.string().min(1),
   logoUrl: z.string().min(1),

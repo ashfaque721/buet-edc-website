@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getCachedResources, createResource } from "@/lib/services/resources";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const resourceSchema = z.object({
   title: z.string().min(1),
   category: z.string().min(1),

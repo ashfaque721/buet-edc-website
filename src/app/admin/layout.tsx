@@ -110,6 +110,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
+        
+        <div className="p-4 border-t border-white/10 text-xs text-white/50 flex flex-col gap-1">
+          <p className="font-semibold text-white/70">BUET EDC Admin Panel</p>
+          <p>
+            Developed by{" "}
+            <a
+              href="https://ashfaque-amin.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-accent hover:underline font-semibold inline-flex items-center gap-0.5"
+            >
+              Ashfaque Amin ↗
+            </a>
+          </p>
+        </div>
       </aside>
 
       {/* Main Content */}

@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     default: "BUET Entrepreneurship Development Club",
   },
   description: "The official Entrepreneurship Development Club of Bangladesh University of Engineering and Technology (BUET). Fostering innovation, incubation, and industry connect.",
+  authors: [{ name: "Ashfaque Amin", url: "https://ashfaque-amin.vercel.app/" }],
+  creator: "Ashfaque Amin",
+  publisher: "BUET EDC",
   openGraph: {
     title: "BUET Entrepreneurship Development Club",
     description: "The official Entrepreneurship Development Club of BUET. Fostering innovation, incubation, and industry connect.",

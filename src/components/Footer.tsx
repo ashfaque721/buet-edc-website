@@ -102,9 +102,21 @@ export default function Footer() {
 
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <p className="text-white/40 text-sm">
             &copy; {new Date().getFullYear()} BUET Entrepreneurship Development Club. All rights reserved.
+          </p>
+          <p className="text-white/50 text-sm flex items-center justify-center gap-1.5">
+            <span>Built by</span>
+            <a
+              href="https://ashfaque-amin.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-accent hover:text-white hover:underline font-semibold transition-colors inline-flex items-center gap-1"
+            >
+              Ashfaque Amin
+              <span className="text-xs opacity-75">↗</span>
+            </a>
           </p>
           <div className="flex items-center gap-6 text-sm text-white/40">
             <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
